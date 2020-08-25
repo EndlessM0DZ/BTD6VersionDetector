@@ -1,11 +1,11 @@
-﻿using System;
+using System;
 using System.IO;
 using System.Windows.Forms;
 //made by Ty Morrison aka Endless#1418
 //special thanks to BowDown097
 public class BTD6VersionDetector
 {
-    byte[] zeroToNine = { 0x30, 0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0x36, 0x38, 0x39 };
+    byte[] zeroToNine = { 0x30, 0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0x37, 0x38, 0x39 };
     byte decimalByte = 0x2E;
     byte[] globalgamemanagers;
     public string VersionDetector(string dir)
@@ -13,8 +13,8 @@ public class BTD6VersionDetector
         try
         {
             int gameOffsetVersionDec = FindGameVersionOffsetDecimal(dir);
-            int NumbersBeforeDec = NumbersBeforeDecimal(gameOffsetVersionDec);
-            int NumbersAfterDec = NumbersAfterDecimal(gameOffsetVersionDec);
+            int NumbersBeforeDec = FromDecimal(gameOffsetVersionDec, -1);//the 1 is negative to go backwards
+            int NumbersAfterDec = FromDecimal(gameOffsetVersionDec, 1);//the 1 is positive to go forwards
             int totalBytes = NumbersBeforeDec + 1 + NumbersAfterDec;
             return BuildVersionString(gameOffsetVersionDec, NumbersBeforeDec, totalBytes);
         }
@@ -45,39 +45,34 @@ public class BTD6VersionDetector
         }
         return -1;
     }
-    private int NumbersBeforeDecimal(int gameOffsetVersionDec)
+    private int FromDecimal(int gameOffsetVersionDec, int i)
     {
-        int i = 0;
         bool continueSearchingBefore = true;
         while (continueSearchingBefore)
         {
-            for (int j = 0; j < zeroToNine.Length; j++)
+            int j = 0;
+            bool searchingCurrentNumber = true;
+            bool tempForEachNum = false;
+            while(searchingCurrentNumber)
             {
                 if (globalgamemanagers[gameOffsetVersionDec + i] == zeroToNine[j])
                 {
+                    tempForEachNum = true;
+                    searchingCurrentNumber = false;
+                }
+                else if (j == 9 && tempForEachNum == false)
+                {
                     continueSearchingBefore = false;
                 }
+                if(j == 9)
+                {
+                    searchingCurrentNumber = false;
+                }
+                j++;
             }
             i--;
         }
         return Math.Abs(i);
-    }
-    private int NumbersAfterDecimal(int gameOffsetVersionDec)
-    {
-        int i = 0;
-        bool continueSearchingAfter = true;
-        while (continueSearchingAfter)
-        {
-            for (int j = 0; j < zeroToNine.Length; j++)
-            {
-                if (globalgamemanagers[gameOffsetVersionDec + i] == zeroToNine[j])
-                {
-                    continueSearchingAfter = false;
-                }
-            }
-            i++;
-        }
-        return i;
     }
     private string BuildVersionString(int gameOffsetVersionDec, int NumbersBeforeDec, int totalBytes)
     {
