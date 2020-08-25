@@ -47,6 +47,7 @@ public class BTD6VersionDetector
     }
     private int FromDecimal(int gameOffsetVersionDec, int i)
     {
+        int n = i;
         bool continueSearchingBefore = true;
         while (continueSearchingBefore)
         {
@@ -67,7 +68,7 @@ public class BTD6VersionDetector
                 }
                 j++;
             }
-            i--;
+            i+=n;
         }
         return Math.Abs(i);
     }
