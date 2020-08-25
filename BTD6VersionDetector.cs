@@ -62,11 +62,8 @@ public class BTD6VersionDetector
                 }
                 else if (j == 9 && tempForEachNum == false)
                 {
-                    continueSearchingBefore = false;
-                }
-                if(j == 9)
-                {
                     searchingCurrentNumber = false;
+                    continueSearchingBefore = false;
                 }
                 j++;
             }
